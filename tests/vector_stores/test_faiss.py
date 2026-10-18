@@ -754,3 +754,15 @@ class TestCosineNormalization:
 
             assert results[0].id == "x"
             assert results[0].score == pytest.approx(1.0, abs=1e-5)
+
+
+def test_list_cols_finds_collections_saved_under_path():
+    """list_cols() must look where _save() writes: <path>/<collection>.faiss."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        faiss_path = os.path.join(temp_dir, "store")
+        FAISS(collection_name="memories", path=faiss_path, embedding_model_dims=2)
+        FAISS(collection_name="memories_entities", path=faiss_path, embedding_model_dims=2)
+
+        store = FAISS(collection_name="memories", path=faiss_path, embedding_model_dims=2)
+
+        assert sorted(store.list_cols()) == ["memories", "memories_entities"]
